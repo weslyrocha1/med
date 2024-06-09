@@ -1,0 +1,160 @@
+/muscle_site
+├── /static
+│   ├── /css
+│   │   └── styles.css
+│   └── /images
+│       └── example_muscle.jpg
+├── /templates
+│   ├── base.html
+│   ├── home.html
+│   ├── muscles.html
+│   ├── muscle_detail.html
+│   ├── about.html
+│   └── contact.html
+├── app.py
+└── models.py
+from flask import Flask, render_template
+from models import get_all_muscles, get_muscle_by_id
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return render_template('home.html')
+
+@app.route('/muscles')
+def muscles():
+    muscles = get_all_muscles()
+    return render_template('muscles.html', muscles=muscles)
+
+@app.route('/muscles/<int:muscle_id>')
+def muscle_detail(muscle_id):
+    muscle = get_muscle_by_id(muscle_id)
+    return render_template('muscle_detail.html', muscle=muscle)
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+def get_all_muscles():
+    return [
+        {"id": 1, "name": "Masseter", "function": "Eleva a mandíbula", "innervation": "Nervo trigêmeo (V3)", "image": "example_muscle.jpg"},
+        {"id": 2, "name": "Trapézio", "function": "Movimenta a escápula", "innervation": "Nervo acessório (XI)", "image": "example_muscle.jpg"},
+        # Adicione mais músculos conforme necessário
+    ]
+
+def get_muscle_by_id(muscle_id):
+    muscles = get_all_muscles()
+    for muscle in muscles:
+        if muscle["id"] == muscle_id:
+            return muscle
+    return None
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlas de Músculos Humanos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Atlas de Músculos Humanos</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('muscles') }}">Músculos</a></li>
+                <li><a href="{{ url_for('about') }}">Sobre Nós</a></li>
+                <li><a href="{{ url_for('contact') }}">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2024 Atlas de Músculos Humanos. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Bem-vindo ao Atlas de Músculos Humanos</h2>
+<p>Explore os músculos do corpo humano, suas funções e inervações.</p>
+{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Lista de Músculos</h2>
+<ul>
+    {% for muscle in muscles %}
+    <li><a href="{{ url_for('muscle_detail', muscle_id=muscle.id) }}">{{ muscle.name }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ muscle.name }}</h2>
+<p><strong>Função:</strong> {{ muscle.function }}</p>
+<p><strong>Inervação:</strong> {{ muscle.innervation }}</p>
+<img src="{{ url_for('static', filename='images/' + muscle.image) }}" alt="{{ muscle.name }}">
+{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Sobre Nós</h2>
+<p>Informações sobre o site e a equipe.</p>
+{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Contato</h2>
+<p>Formulário de contato.</p>
+{% endblock %}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background-color: #333;
+    color: white;
+    padding: 1em 0;
+}
+header h1 {
+    text-align: center;
+}
+nav ul {
+    list-style: none;
+    text-align: center;
+    padding: 0;
+}
+nav ul li {
+    display: inline;
+    margin: 0 1em;
+}
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+main {
+    padding: 2em;
+}
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+flask run
